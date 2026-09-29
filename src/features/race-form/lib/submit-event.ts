@@ -1,5 +1,15 @@
-import { collection, doc, serverTimestamp, setDoc, terminate } from 'firebase/firestore';
-import type { FirebaseContext } from '@/shared/firebase';
+import {
+  collection,
+  doc,
+  getDoc,
+  serverTimestamp,
+  setDoc
+} from 'firebase/firestore';
+import { disposeFirebaseContext, type FirebaseContext } from '@/shared/firebase';
+import {
+  PLATFORM_LIFETIME_STAT_KEYS,
+  incrementPlatformLifetimeStat
+} from '@/shared/firestore/platformLifetimeStats';
 import { ensureVoiceBlobPlayableOnMobile } from './voice';
 import { uploadVoiceViaStorageRest } from './storage-upload';
 import type { SubmitPayload, SubmitResult } from '../model/types';
@@ -9,6 +19,22 @@ function createEventId(): string {
     return crypto.randomUUID();
   }
   return `evt_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function assertRaceAcceptsMessages(
+  raceData: Record<string, unknown> | undefined
+): void {
+  const status = raceData?.status;
+  if (status === 'active') {
+    const err = new Error('Race is in progress') as Error & { code?: string };
+    err.code = 'race/in-progress';
+    throw err;
+  }
+  if (status === 'completed') {
+    const err = new Error('Race is completed') as Error & { code?: string };
+    err.code = 'race/completed';
+    throw err;
+  }
 }
 
 export async function submitEvent(
@@ -22,6 +48,19 @@ export async function submitEvent(
     throw new Error('Missing raceId in URL (?raceId=...)');
   }
 
+  if (!firebaseCtx) {
+    throw new Error('Firebase is not configured');
+  }
+
+  // Re-check right before write so a tab left open mid-run cannot still submit.
+  const raceSnap = await getDoc(doc(firebaseCtx.db, 'races', raceId));
+  if (!raceSnap.exists()) {
+    const err = new Error('Race not found') as Error & { code?: string };
+    err.code = 'race/missing';
+    throw err;
+  }
+  assertRaceAcceptsMessages(raceSnap.data() as Record<string, unknown>);
+
   const docData: Record<string, unknown> = {
     status: 'queued',
     type: payload.format,
@@ -29,6 +68,7 @@ export async function submitEvent(
     messageTriggerType: payload.context.messageTriggerType,
     raceId,
     runnerName: payload.context.name,
+    fromName: payload.fromName,
     createdAt: serverTimestamp()
   };
 
@@ -55,9 +95,6 @@ export async function submitEvent(
   }
 
   if (payload.format === 'voice' && payload.voiceBlob) {
-    if (!firebaseCtx) {
-      throw new Error('Firebase is not configured');
-    }
     let voiceUploadBlob = payload.voiceBlob;
     try {
       voiceUploadBlob = await ensureVoiceBlobPlayableOnMobile(payload.voiceBlob);
@@ -86,28 +123,25 @@ export async function submitEvent(
       throw uploadError;
     }
     if (typeof docData.mediaUrl !== 'string' || !docData.mediaUrl.trim()) {
-      const err = new Error('Voice file URL missing after upload') as Error & { code?: string };
+      const err = new Error('Voice file URL missing after upload') as Error & {
+        code?: string;
+      };
       err.code = 'storage/unknown';
       throw err;
     }
   }
 
-  if (!firebaseCtx) {
-    throw new Error('Firebase is not configured');
-  }
-
   const eventRef = doc(collection(firebaseCtx.db, 'races', raceId, 'events'), eventId);
   await setDoc(eventRef, docData);
+  await incrementPlatformLifetimeStat(
+    firebaseCtx.db,
+    PLATFORM_LIFETIME_STAT_KEYS.messages
+  );
   return { eventId, format: payload.format };
 }
 
 export async function shutdownFirestore(firebaseCtx: FirebaseContext | null): Promise<void> {
-  if (!firebaseCtx) {
-    return;
-  }
-  try {
-    await terminate(firebaseCtx.db);
-  } catch {
-    /* ignore shutdown errors */
-  }
+  // terminate() leaves the default app in place with a dead Firestore client.
+  // Delete the app too so "Send another" can create a live client again.
+  await disposeFirebaseContext(firebaseCtx);
 }

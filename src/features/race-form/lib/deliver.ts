@@ -32,6 +32,37 @@ export function buildTimeSnaps(maxSeconds: number): TimeSnap[] {
   ];
 }
 
+/** Milestone labels scaled to this race distance (not fixed marathon miles). */
+export function buildMilestoneSnaps(distanceMiles: number): MilestoneSnap[] {
+  const distance = Math.max(0.1, distanceMiles);
+  return [
+    {
+      mile: 0,
+      title: 'Start line',
+      detail: 'Send encouragement before the gun.'
+    },
+    {
+      mile: roundMile(distance * 0.5),
+      title: 'Halfway there',
+      detail: 'Halfway on the course — send a boost.'
+    },
+    {
+      mile: roundMile(distance * 0.75),
+      title: 'The grind',
+      detail: 'When the race gets honest — they need you.'
+    },
+    {
+      mile: roundMile(distance),
+      title: 'Finish line',
+      detail: 'Cross the line together.'
+    }
+  ];
+}
+
+function roundMile(value: number): number {
+  return Math.round(value * 10) / 10;
+}
+
 export function formatRaceClock(totalSeconds: number): string {
   const s = Math.max(0, Math.round(totalSeconds));
   const h = Math.floor(s / 3600);
@@ -70,13 +101,6 @@ export function nearestTimeSnap(
   };
 }
 
-export const MILESTONE_SNAPS: MilestoneSnap[] = [
-  { mile: 0, title: 'Start line', detail: 'Send encouragement before the gun.' },
-  { mile: 13.1, title: 'Half marathon', detail: 'Halfway on the course — send a boost.' },
-  { mile: 20, title: 'The wall', detail: 'Heartbreak Hill — right when it counts.' },
-  { mile: 26.2, title: 'Finish line', detail: 'Cross the line together.' }
-];
-
 export function formatMile(value: number): string {
   return Number.isInteger(value) ? String(value) : value.toFixed(1);
 }
@@ -85,23 +109,25 @@ export function nearestMilestone(
   mile: number,
   distance: number
 ): MilestoneSnap {
-  const points = MILESTONE_SNAPS.filter((p) => p.mile <= distance + 0.01);
-  if (points.length === 0) {
-    return { mile, title: `Mile ${formatMile(mile)}`, detail: '' };
-  }
-  let best = points[0];
-  let bestDiff = Math.abs(mile - best.mile);
-  for (const p of points) {
-    const d = Math.abs(mile - p.mile);
-    if (d < bestDiff) {
-      best = p;
-      bestDiff = d;
+  const snaps = buildMilestoneSnaps(distance);
+  const clamped = Math.min(Math.max(0, mile), Math.max(0.1, distance));
+  const windowMiles = Math.max(0.05, distance * 0.03);
+
+  let best = snaps[0];
+  let bestDiff = Math.abs(clamped - best.mile);
+  for (const snap of snaps) {
+    const diff = Math.abs(clamped - snap.mile);
+    if (diff < bestDiff) {
+      best = snap;
+      bestDiff = diff;
     }
   }
-  if (bestDiff <= 0.75) {
+
+  if (bestDiff <= windowMiles) {
     return best;
   }
-  return { mile, title: `Mile ${formatMile(mile)}`, detail: '' };
+
+  return { mile: clamped, title: `Mile ${formatMile(clamped)}`, detail: '' };
 }
 
 export function formatDurationMs(ms: number): string {

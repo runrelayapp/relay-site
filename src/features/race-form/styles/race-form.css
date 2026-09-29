@@ -135,11 +135,11 @@ textarea {
 }
 
 .brand__icon {
-  width: 1.5rem;
-  height: auto;
+  width: 1.75rem;
+  height: 1.75rem;
   max-width: none;
   flex-shrink: 0;
-  color: var(--accent);
+  object-fit: contain;
 }
 
 .brand__name {
@@ -172,6 +172,38 @@ textarea {
   font-size: 0.9375rem;
   color: var(--text-muted);
   max-width: 36ch;
+}
+
+.from-name-field {
+  margin-bottom: 1.5rem;
+}
+
+.from-name-input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+
+.from-name-field--error .from-name-input {
+  border-color: var(--accent-dark);
+}
+
+.from-name-input:focus {
+  outline: 2px solid var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.from-name-error {
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--accent-dark);
+}
+
+.from-name-field--error {
+  margin-bottom: 1.25rem;
 }
 
 .section-label {
@@ -256,6 +288,8 @@ textarea {
   border-radius: 999px;
   cursor: pointer;
   font-weight: 600;
+  text-decoration: none;
+  color: inherit;
   transition: opacity 0.15s, transform 0.1s;
 }
 
@@ -765,20 +799,124 @@ textarea {
   font-weight: 600;
 }
 
-.deliver-summary #deliver-detail {
+.deliver-summary__point {
+  display: block;
+}
+
+.deliver-summary__detail {
   color: var(--text-muted);
   font-family: var(--font-sans);
   font-size: 0.875rem;
   font-weight: 400;
   display: block;
   margin-top: 0.2rem;
-  min-height: 1.125rem;
+}
+
+.deliver-occupied-hint {
+  margin: -0.35rem 0 0.65rem;
+  font-size: 0.75rem;
+  color: var(--text-soft);
+}
+
+.deliver-track {
+  position: relative;
+  height: 2rem;
+  margin: 0.35rem 0 0.75rem;
+  display: flex;
+  align-items: center;
+}
+
+.deliver-rail {
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  top: 50%;
+  height: 0.35rem;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  background: var(--border-strong);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.deliver-markers {
+  position: absolute;
+  inset: 0 0.75rem;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.deliver-marker {
+  position: absolute;
+  top: 50%;
+  width: 0.7rem;
+  height: 0.7rem;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(26, 18, 14, 0.2);
 }
 
 .deliver-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  position: relative;
+  z-index: 2;
   width: 100%;
-  margin: 0.5rem 0 0.75rem;
-  accent-color: var(--accent);
+  height: 2rem;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.deliver-slider:focus {
+  outline: none;
+}
+
+.deliver-slider:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.deliver-slider:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.deliver-slider::-webkit-slider-runnable-track {
+  height: 0.35rem;
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+}
+
+.deliver-slider::-moz-range-track {
+  height: 0.35rem;
+  background: transparent;
+  border: none;
+  border-radius: 999px;
+}
+
+.deliver-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-top: calc((0.35rem - 1.25rem) / 2);
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(26, 18, 14, 0.25);
+  cursor: grab;
+}
+
+.deliver-slider::-moz-range-thumb {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(26, 18, 14, 0.25);
+  cursor: grab;
 }
 
 .deliver-ticks {
@@ -793,6 +931,25 @@ textarea {
   text-align: center;
   font-size: 0.8125rem;
   color: var(--text-soft);
+}
+
+.legal-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0.4rem 0 0;
+  font-size: 0.75rem;
+}
+
+.legal-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.legal-links a:hover {
+  color: var(--accent);
+  text-decoration: underline;
 }
 
 .spinner {
@@ -831,8 +988,17 @@ textarea {
   margin-top: 0.5rem;
 }
 
+.race-unavailable nav {
+  justify-content: flex-start;
+  margin-top: 1.75rem;
+}
+
 #race-loading {
   margin: 0 0 1rem;
+}
+
+.race-form-skeleton {
+  margin-top: 0.75rem;
 }
 
 @media (min-width: 480px) {

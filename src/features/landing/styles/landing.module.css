@@ -237,6 +237,15 @@
   margin: 0 auto 48px;
 }
 
+.legalLinks {
+  justify-content: center;
+  margin-top: 0;
+  margin-bottom: 16px;
+  padding-top: 0;
+  border-top: none;
+  font-size: 13px;
+}
+
 .footer {
   font-size: 12px;
   color: var(--landing-border, #3d2416);

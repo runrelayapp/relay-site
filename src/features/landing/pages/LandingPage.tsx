@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { t } from '@/shared/lib/i18n';
+import { LegalNav } from '@/shared/ui/legal-nav';
 import styles from '../styles/landing.module.css';
 
 const NOTIFY_FORM_URL =
@@ -145,6 +146,7 @@ export function LandingPage(): React.JSX.Element {
       </a>
 
       <div className={styles.divider} />
+      <LegalNav className={styles.legalLinks} showHome={false} />
       <footer className={styles.footer}>{t('landing.footer')}</footer>
 
       <iframe name="hidden_iframe" title="notify" style={{ display: 'none' }} />

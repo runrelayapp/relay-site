@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { t } from '@/shared/lib/i18n';
+import { OrganizerResetPasswordForm } from '../ui/OrganizerResetPasswordForm';
 import '../styles/reset-password.css';
 
 interface ActionParams {
@@ -56,18 +57,41 @@ function buildAppResetUrl(mode: string, oobCode: string): string {
   return `relayapp://reset-password?mode=${encodeURIComponent(mode)}&oobCode=${encodeURIComponent(oobCode)}`;
 }
 
+function isOrganizerPasswordReset(continueUrl: string | null): boolean {
+  if (!continueUrl) {
+    return false;
+  }
+
+  try {
+    return new URL(continueUrl).pathname.startsWith('/organizer');
+  } catch {
+    return continueUrl.includes('/organizer');
+  }
+}
+
 export function ResetPasswordPage(): React.JSX.Element {
   const location = useLocation();
   const [status, setStatus] = useState(t('reset.status.idle'));
   const [appUrl, setAppUrl] = useState<string | null>(null);
+  const [organizerOobCode, setOrganizerOobCode] = useState<string | null>(null);
 
   useEffect(() => {
     const action = getActionParams(location.search, location.hash);
     if (!action) {
       setStatus(t('reset.status.missing'));
       setAppUrl(null);
+      setOrganizerOobCode(null);
       return;
     }
+
+    if (action.mode === 'resetPassword' && isOrganizerPasswordReset(action.continueUrl)) {
+      setAppUrl(null);
+      setStatus('');
+      setOrganizerOobCode(action.oobCode);
+      return;
+    }
+
+    setOrganizerOobCode(null);
 
     if (action.mode === 'resetPassword') {
       const url = buildAppResetUrl(action.mode, action.oobCode);
@@ -83,12 +107,18 @@ export function ResetPasswordPage(): React.JSX.Element {
 
   return (
     <div className="reset-password">
-      <p className="reset-password__status">{status}</p>
-      {appUrl ? (
-        <a className="reset-password__button" href={appUrl}>
-          {t('reset.openApp')}
-        </a>
-      ) : null}
+      {organizerOobCode ? (
+        <OrganizerResetPasswordForm oobCode={organizerOobCode} />
+      ) : (
+        <>
+          <p className="reset-password__status">{status}</p>
+          {appUrl ? (
+            <a className="reset-password__button" href={appUrl}>
+              {t('reset.openApp')}
+            </a>
+          ) : null}
+        </>
+      )}
     </div>
   );
 }

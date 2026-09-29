@@ -39,11 +39,18 @@ export interface MilestoneSnap {
 }
 
 export type RaceGateOk = { ok: true; context: PageContext };
-export type RaceGateFail = { ok: false; title: string; body: string };
+export type RaceGateFail = {
+  ok: false;
+  title: string;
+  body: string;
+  /** Optional; defaults to the generic link-problem eyebrow. */
+  eyebrow?: string;
+};
 export type RaceGateResult = RaceGateOk | RaceGateFail;
 
 export interface SubmitPayload {
   format: MessageFormat;
+  fromName: string;
   mileTrigger?: number;
   timeTrigger?: number;
   context: PageContext;

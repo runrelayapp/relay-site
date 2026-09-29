@@ -1,0 +1,49 @@
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.65rem;
+  margin-top: 2.5rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--landing-border, #3d2416);
+  font-size: 0.85rem;
+}
+
+.nav a {
+  color: var(--landing-coral, #d4856a);
+  text-decoration: none;
+}
+
+.nav a:hover {
+  color: var(--landing-terracotta, #e8724a);
+  text-decoration: underline;
+}
+
+.current {
+  color: var(--landing-muted, #8a6e62);
+}
+
+.sep {
+  color: var(--landing-muted, #8a6e62);
+}
+
+.navForm {
+  margin-top: 0.4rem;
+  padding-top: 0;
+  border-top: none;
+  justify-content: center;
+  font-size: 0.75rem;
+}
+
+.navForm a {
+  color: var(--text-muted, #6b5344);
+}
+
+.navForm a:hover {
+  color: var(--accent, #e8724a);
+}
+
+.navForm .current,
+.navForm .sep {
+  color: var(--text-soft, #8a6f5c);
+}

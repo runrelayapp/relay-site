@@ -20,3 +20,12 @@
   margin-left: auto;
   margin-right: auto;
 }
+
+.sent__actions {
+  margin: 1.75rem auto 0;
+  max-width: 22rem;
+}
+
+.sent nav {
+  margin-top: 2rem;
+}

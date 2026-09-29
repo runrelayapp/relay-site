@@ -72,6 +72,25 @@ export async function resolveRaceGate(
     }
 
     const data = snap.data() as Record<string, unknown>;
+    const raceStatus = data.status;
+
+    if (raceStatus === 'active') {
+      return {
+        ok: false,
+        eyebrow: t('race.unavailable.inProgressEyebrow'),
+        title: t('race.unavailable.inProgressTitle'),
+        body: t('race.unavailable.inProgressBody')
+      };
+    }
+
+    if (raceStatus === 'completed') {
+      return {
+        ok: false,
+        eyebrow: t('race.unavailable.completeEyebrow'),
+        title: t('race.unavailable.finishedTitle'),
+        body: t('race.unavailable.finishedBody')
+      };
+    }
 
     const raceDateRaw = data.raceDate;
     if (typeof raceDateRaw === 'string' && raceDateRaw.trim()) {
@@ -79,6 +98,7 @@ export async function resolveRaceGate(
       if (daysUntilRace !== null && daysUntilRace < 0) {
         return {
           ok: false,
+          eyebrow: t('race.unavailable.completeEyebrow'),
           title: t('race.unavailable.finishedTitle'),
           body: t('race.unavailable.finishedBody')
         };

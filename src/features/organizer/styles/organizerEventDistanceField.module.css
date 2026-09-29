@@ -1,0 +1,56 @@
+.compact {
+  border: 1px solid #4a342e;
+  background: #140c0b;
+  border-radius: 0.625rem;
+  padding: 0.65rem 0.75rem 0.75rem;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.value {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #f3e9df;
+}
+
+.steppers {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.stepBtn {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid #4a342e;
+  border-radius: 0.5rem;
+  background: #1b1110;
+  color: #f3e9df;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.stepBtn:hover:not(:disabled) {
+  background: #241513;
+}
+
+.stepBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.range {
+  width: 100%;
+  margin: 0;
+  accent-color: #f47648;
+  cursor: pointer;
+  height: 1.25rem;
+}

@@ -1,0 +1,3 @@
+export function normalizeEventCode(value: string): string {
+  return value.trim().toUpperCase().replace(/\s+/g, '').slice(0, 12);
+}

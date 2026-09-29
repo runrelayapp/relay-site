@@ -34,6 +34,12 @@ export function mapSubmitErrorMessage(error: unknown): string {
     return t('error.storage.generic');
   }
 
+  if (code === 'race/in-progress') {
+    return t('error.raceInProgress');
+  }
+  if (code === 'race/completed' || code === 'race/missing') {
+    return t('error.raceClosed');
+  }
   if (code === 'permission-denied') {
     return t('error.permission');
   }

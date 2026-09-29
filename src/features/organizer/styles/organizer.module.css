@@ -1,0 +1,160 @@
+.dashboardActions {
+  margin-top: 1.35rem;
+}
+
+.dialogForm {
+  margin-top: 0;
+}
+
+.forgotButton {
+  display: inline-flex;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #e8724a;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.forgotButton:focus-visible {
+  outline: 2px solid #e8724a;
+  outline-offset: 2px;
+}
+
+.forgotNotice {
+  margin: 0.85rem 0 0;
+  color: rgba(245, 230, 216, 0.78);
+}
+
+.forgotError {
+  margin: 0.85rem 0 0;
+  color: #ffb4a4;
+}
+
+.eventRowLink {
+  display: block;
+  flex: 1;
+  min-width: 0;
+  text-decoration: none;
+  color: inherit;
+}
+
+.eventRowActions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+}
+
+.copyCodeButton {
+  border: 1px solid rgba(245, 230, 216, 0.18);
+  background: transparent;
+  color: rgba(245, 230, 216, 0.88);
+  border-radius: 10px;
+  padding: 0.4rem 0.65rem;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.copyCodeButton:hover {
+  border-color: rgba(232, 114, 74, 0.45);
+  background: rgba(232, 114, 74, 0.08);
+}
+
+.eventRowChevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.contentMode {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.contentModeBtn {
+  border: 1px solid #4a342e;
+  background: transparent;
+  color: #d7c9c0;
+  padding: 0.55rem 1rem;
+  border-radius: 1.5rem;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.contentModeBtn:hover:not(:disabled) {
+  background: #241513;
+}
+
+.contentModeBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.contentModeBtnActive {
+  background: #211311;
+  color: #fff;
+  border-color: #5a4037;
+}
+
+.broadcastAudio {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.broadcastAudioInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.broadcastAudioRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid rgba(245, 230, 216, 0.12);
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.broadcastAudioName {
+  font-size: 0.82rem;
+  color: rgba(245, 230, 216, 0.88);
+  word-break: break-word;
+}
+
+.broadcastAudioActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.messageAudioBadge {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(232, 114, 74, 0.95);
+}
