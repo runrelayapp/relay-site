@@ -1,47 +1,663 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#1A0F0A" />
-    <title>Relay – Voices from the sidelines, mile by mile</title>
-    <meta
-      name="description"
-      content="Relay is a warm running companion that delivers voice notes, texts, and songs from your people at the exact mile you need them."
-    />
-    <link rel="icon" href="/favicon.png" type="image/png" sizes="512x512" />
-    <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
-    <link rel="icon" href="/favicon-16.png" type="image/png" sizes="16x16" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
-    <meta property="og:site_name" content="Relay" />
-    <meta property="og:title" content="Relay – Voices from the sidelines, mile by mile" />
-    <meta
-      property="og:description"
-      content="Relay is a warm running companion that delivers voice notes, texts, and songs from your people at the exact mile you need them."
-    />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://runrelay.org/" />
-    <meta property="og:image" content="https://runrelay.org/og-image.png" />
-    <meta property="og:image:type" content="image/png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="1200" />
-    <meta property="og:image:alt" content="Relay" />
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="Relay – Voices from the sidelines, mile by mile" />
-    <meta
-      name="twitter:description"
-      content="Relay is a warm running companion that delivers voice notes, texts, and songs from your people at the exact mile you need them."
-    />
-    <meta name="twitter:image" content="https://runrelay.org/og-image.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@500;600&family=Inter:wght@300;400;500&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap"
-      rel="stylesheet"
-    />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relay — a warmer way to run</title>
+<meta name="description" content="Relay lets your crew send voice notes, texts, and songs that surface right when you need them, mile by mile. Coming soon to the App Store.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #1a0f0a;
+    --bg-soft: #241408;
+    --card: #2b1810;
+    --cream: #f4ece0;
+    --cream-dim: #cbb9a8;
+    --muted: #9c8674;
+    --orange: #e8703f;
+    --orange-light: #f4a271;
+    --orange-dim: #7a4128;
+    --line: rgba(244,236,224,0.1);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--cream);
+    font-family:'Inter', sans-serif;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; scroll-behavior:auto !important;}
+  }
+  a{color:inherit;}
+  img{max-width:100%; display:block;}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 32px;}
+  .serif{font-family:'Fraunces', serif;}
+
+  /* ---------- background blobs ---------- */
+  .blob{
+    position:absolute;
+    border-radius:44% 56% 60% 40% / 50% 45% 55% 50%;
+    background:var(--orange);
+    filter:blur(2px);
+    opacity:0.85;
+    z-index:0;
+    pointer-events:none;
+  }
+  .blob.soft{filter:blur(60px); opacity:0.35;}
+  @keyframes drift{
+    0%{transform:translate(0,0) rotate(0deg);}
+    50%{transform:translate(18px,-24px) rotate(8deg);}
+    100%{transform:translate(0,0) rotate(0deg);}
+  }
+  @keyframes drift-rev{
+    0%{transform:translate(0,0) rotate(0deg);}
+    50%{transform:translate(-20px,20px) rotate(-6deg);}
+    100%{transform:translate(0,0) rotate(0deg);}
+  }
+  @keyframes float-phone{
+    0%{transform:translateY(0) rotate(var(--tilt,0deg));}
+    50%{transform:translateY(-16px) rotate(var(--tilt,0deg));}
+    100%{transform:translateY(0) rotate(var(--tilt,0deg));}
+  }
+
+  /* ---------- nav ---------- */
+  header{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    background:linear-gradient(to bottom, rgba(26,15,10,0.92), rgba(26,15,10,0));
+    padding:22px 0 40px;
+    transition:background 0.3s ease;
+  }
+  .nav{display:flex; align-items:center; justify-content:space-between;}
+  .logo{display:flex; align-items:center; gap:9px; font-family:'Fraunces', serif; font-size:1.3rem; letter-spacing:0.04em; font-weight:600;}
+  .logo svg{width:26px; height:26px;}
+  nav.links{display:flex; gap:36px; font-size:0.92rem; color:var(--cream-dim);}
+  nav.links a{text-decoration:none; transition:color .2s ease; position:relative;}
+  nav.links a:hover, nav.links a:focus-visible{color:var(--cream);}
+  .nav-cta{
+    background:var(--orange); color:#1a0f0a; padding:10px 20px; border-radius:100px;
+    font-weight:600; font-size:0.88rem; text-decoration:none; white-space:nowrap;
+  }
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;
+    min-height:100vh;
+    display:flex; align-items:center;
+    padding:160px 0 100px;
+    overflow:hidden;
+  }
+  .hero-grid{
+    position:relative; z-index:2;
+    display:grid; grid-template-columns:1.05fr 0.95fr; gap:40px; align-items:center;
+    width:100%;
+  }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    color:var(--orange-light); font-size:0.82rem; letter-spacing:0.12em; text-transform:uppercase;
+    font-weight:600; margin-bottom:26px;
+  }
+  .eyebrow::before{content:""; width:7px; height:7px; border-radius:50%; background:var(--orange); box-shadow:0 0 0 4px rgba(232,112,63,0.25);}
+  h1.hero-title{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:clamp(3.2rem, 6vw, 5.4rem);
+    line-height:0.98;
+    letter-spacing:-0.01em;
+    margin-bottom:26px;
+  }
+  h1.hero-title em{font-style:italic; color:var(--orange); font-weight:400;}
+  .hero-sub{
+    font-size:1.14rem; line-height:1.65; color:var(--cream-dim);
+    max-width:460px; margin-bottom:38px;
+  }
+  .hero-actions{display:flex; align-items:center; gap:20px; flex-wrap:wrap;}
+  .btn-primary{
+    background:var(--orange); color:#1a0f0a; padding:15px 28px; border-radius:100px;
+    font-weight:600; text-decoration:none; font-size:0.96rem;
+    display:inline-flex; align-items:center; gap:10px;
+    transition:transform .25s ease, box-shadow .25s ease;
+    box-shadow:0 8px 24px -8px rgba(232,112,63,0.6);
+  }
+  .btn-primary:hover{transform:translateY(-2px); box-shadow:0 12px 28px -6px rgba(232,112,63,0.75);}
+  .btn-ghost{
+    color:var(--cream-dim); text-decoration:none; font-size:0.94rem; font-weight:500;
+    border-bottom:1px solid var(--line); padding-bottom:2px;
+    transition:color .2s ease, border-color .2s ease;
+  }
+  .btn-ghost:hover{color:var(--cream); border-color:var(--cream-dim);}
+
+  .hero-phone-stage{
+    position:relative;
+    display:flex; justify-content:center;
+  }
+  .hero-phone-stage img{
+    width:min(360px, 78vw);
+    filter:drop-shadow(0 40px 60px rgba(0,0,0,0.55));
+    animation:float-phone 6.5s ease-in-out infinite;
+    --tilt:-3deg;
+  }
+
+  .scroll-cue{
+    position:absolute; bottom:36px; left:50%; transform:translateX(-50%);
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+    color:var(--muted); font-size:0.74rem; letter-spacing:0.14em; text-transform:uppercase;
+    z-index:3;
+  }
+  .scroll-cue .line{width:1px; height:36px; background:linear-gradient(var(--orange), transparent); animation:scrollpulse 1.8s ease-in-out infinite;}
+  @keyframes scrollpulse{0%,100%{opacity:0.3;} 50%{opacity:1;}}
+
+  /* ---------- intro strip ---------- */
+  .intro{
+    position:relative; z-index:2;
+    padding:70px 0 40px;
+    border-top:1px solid var(--line);
+  }
+  .intro p{
+    font-family:'Fraunces', serif;
+    font-size:clamp(1.5rem, 2.6vw, 2.15rem);
+    line-height:1.45;
+    color:var(--cream-dim);
+    max-width:900px;
+  }
+  .intro p strong{color:var(--cream); font-weight:500; font-style:italic;}
+
+  /* ---------- course / features ---------- */
+  .course{
+    position:relative;
+    padding:60px 0 40px;
+  }
+  .course-track{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+  }
+  .course-rail{
+    position:absolute;
+    left:23px; top:14px; bottom:14px; width:2px;
+    background:var(--line);
+    z-index:0;
+  }
+  .course-rail-fill{
+    position:absolute; top:0; left:0; width:100%; height:0%;
+    background:linear-gradient(var(--orange), var(--orange-light));
+    transition:height .1s linear;
+  }
+
+  .stop{
+    position:relative;
+    display:grid;
+    grid-template-columns:48px 1fr;
+    gap:8px;
+    padding:70px 0;
+  }
+  .stop:first-child{padding-top:10px;}
+  .marker-col{position:relative; z-index:1;}
+  .marker-dot{
+    width:48px; height:48px; border-radius:50%;
+    background:var(--bg-soft);
+    border:1.5px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Fraunces', serif; font-size:0.72rem; color:var(--muted);
+    transition:all .5s ease;
+  }
+  .stop.active .marker-dot{
+    background:var(--orange); border-color:var(--orange); color:#1a0f0a; font-weight:600;
+    box-shadow:0 0 0 8px rgba(232,112,63,0.16);
+  }
+  .stop-body{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:64px;
+    align-items:center;
+  }
+  .stop:nth-child(even) .stop-body{direction:rtl;}
+  .stop:nth-child(even) .stop-body > *{direction:ltr;}
+
+  .stop-copy{
+    opacity:0; transform:translateY(28px);
+    transition:opacity .8s ease, transform .8s ease;
+  }
+  .stop.active .stop-copy{opacity:1; transform:translateY(0);}
+
+  .stop-tag{
+    font-size:0.78rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--orange-light);
+    font-weight:600; margin-bottom:16px; display:block;
+  }
+  .stop-copy h3{
+    font-family:'Fraunces', serif; font-weight:500;
+    font-size:clamp(1.9rem, 3vw, 2.5rem);
+    line-height:1.1; margin-bottom:18px; letter-spacing:-0.01em;
+  }
+  .stop-copy p{
+    font-size:1.04rem; line-height:1.7; color:var(--cream-dim); max-width:420px;
+  }
+
+  .stop-visual{
+    position:relative;
+    display:flex; justify-content:center;
+    opacity:0; transform:translateY(40px) scale(0.96);
+    transition:opacity .9s ease .1s, transform .9s ease .1s;
+  }
+  .stop.active .stop-visual{opacity:1; transform:translateY(0) scale(1);}
+  .stop-visual img{
+    width:min(300px, 64vw);
+    border-radius:28px;
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.6);
+  }
+  .stop-visual .blob{width:220px; height:220px; top:10%; z-index:-1;}
+  .stop:nth-child(odd) .stop-visual .blob{right:6%;}
+  .stop:nth-child(even) .stop-visual .blob{left:6%;}
+
+  /* ---------- proof / voice strip ---------- */
+  .quote-strip{
+    position:relative; z-index:1;
+    padding:100px 0;
+    text-align:center;
+  }
+  .quote-strip .mark{
+    font-family:'Fraunces', serif; font-style:italic; font-size:clamp(1.6rem,3.4vw,2.6rem);
+    line-height:1.4; color:var(--cream); max-width:760px; margin:0 auto 22px;
+  }
+  .quote-strip .mark .accent{color:var(--orange);}
+  .quote-strip .who{color:var(--muted); font-size:0.9rem; letter-spacing:0.06em;}
+
+  /* ---------- CTA / coming soon ---------- */
+  .cta{
+    position:relative;
+    padding:120px 0 100px;
+    border-top:1px solid var(--line);
+    text-align:center;
+    overflow:hidden;
+  }
+  .cta-badge{
+    display:inline-flex; align-items:center; gap:9px;
+    background:rgba(232,112,63,0.12); border:1px solid rgba(232,112,63,0.3);
+    color:var(--orange-light); padding:8px 18px; border-radius:100px;
+    font-size:0.78rem; letter-spacing:0.1em; text-transform:uppercase; font-weight:600;
+    margin-bottom:30px;
+  }
+  .cta-badge::before{content:""; width:6px; height:6px; border-radius:50%; background:var(--orange); animation:scrollpulse 1.6s ease-in-out infinite;}
+  .cta h2{
+    font-family:'Fraunces', serif; font-weight:500;
+    font-size:clamp(2.4rem, 5vw, 4rem);
+    line-height:1.05; letter-spacing:-0.01em; margin-bottom:22px;
+  }
+  .cta h2 em{color:var(--orange); font-style:italic; font-weight:400;}
+  .cta p.sub{
+    color:var(--cream-dim); font-size:1.08rem; max-width:520px; margin:0 auto 46px; line-height:1.6;
+  }
+  .store-row{
+    display:flex; justify-content:center; gap:18px; flex-wrap:wrap; margin-bottom:34px;
+  }
+  .store-btn{
+    display:flex; align-items:center; gap:12px;
+    background:var(--card); border:1px solid var(--line);
+    padding:14px 24px; border-radius:14px;
+    color:var(--cream-dim); text-decoration:none;
+    transition:border-color .2s ease, transform .2s ease;
+  }
+  .store-btn:hover{border-color:var(--muted); transform:translateY(-2px);}
+  .store-btn svg{width:26px; height:26px; flex-shrink:0; opacity:0.85;}
+  .store-btn .txt{text-align:left; line-height:1.25;}
+  .store-btn .txt small{display:block; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted);}
+  .store-btn .txt strong{font-family:'Fraunces', serif; font-size:1.05rem; font-weight:500; color:var(--cream);}
+
+  .follow-link{
+    display:inline-flex; align-items:center; gap:8px;
+    color:var(--orange-light); text-decoration:none; font-weight:600; font-size:0.96rem;
+    border-bottom:1px solid rgba(244,162,113,0.4); padding-bottom:2px;
+    transition:opacity .2s ease;
+  }
+  .follow-link:hover{opacity:0.8;}
+
+  /* ---------- footer ---------- */
+  footer{
+    border-top:1px solid var(--line);
+    padding:64px 0 56px;
+    text-align:center;
+  }
+  .foot-social{
+    display:flex; align-items:center; justify-content:center; gap:28px; flex-wrap:wrap;
+    margin-bottom:40px;
+  }
+  .foot-social a{
+    display:inline-flex; align-items:center; gap:9px;
+    color:var(--muted); text-decoration:none; font-size:0.98rem;
+    transition:color .2s ease;
+  }
+  .foot-social a:hover{color:var(--cream-dim);}
+  .foot-social svg{width:19px; height:19px; flex-shrink:0;}
+  .foot-divider{
+    width:44px; height:1px; background:var(--line);
+    margin:0 auto 40px;
+  }
+  .foot-legal{
+    display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap;
+    font-size:0.82rem; margin-bottom:34px;
+  }
+  .foot-legal a{color:var(--orange-light); text-decoration:none; transition:opacity .2s ease;}
+  .foot-legal a:hover{opacity:0.75;}
+  .foot-legal .dot{color:var(--cream);}
+  .foot-tagline{color:var(--muted); font-size:0.9rem; letter-spacing:0.02em;}
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 880px){
+    .hero{padding-top:130px;}
+    .hero-grid{grid-template-columns:1fr; text-align:left;}
+    .hero-phone-stage{margin-top:20px;}
+    nav.links{display:none;}
+    .stop-body{grid-template-columns:1fr; gap:30px;}
+    .stop:nth-child(even) .stop-body{direction:ltr;}
+    .stop{grid-template-columns:36px 1fr; padding:46px 0;}
+    .marker-dot{width:36px; height:36px; font-size:0.62rem;}
+    .course-rail{left:17px;}
+    .stop-copy p{max-width:none;}
+  }
+  @media (max-width: 520px){
+    .wrap{padding:0 20px;}
+    .store-row{flex-direction:column; align-items:stretch;}
+  }
+
+  /* ---------- custom cursor ---------- */
+  body.custom-cursor-active,
+  body.custom-cursor-active a,
+  body.custom-cursor-active button{
+    cursor:none;
+  }
+  .cursor-dot{
+    position:fixed; top:0; left:0; width:10px; height:10px; border-radius:50%;
+    background:var(--orange); pointer-events:none; z-index:9999;
+    transform:translate(-50%,-50%);
+    transition:width .25s ease, height .25s ease, background-color .25s ease;
+    animation:cursor-pulse 2.2s ease-out infinite;
+    display:none;
+  }
+  .cursor-dot.active{display:block;}
+  .cursor-dot.hovering{width:26px; height:26px; background:var(--cream);}
+  @keyframes cursor-pulse{
+    0%{box-shadow:0 0 0 0 rgba(232,112,63,0.45);}
+    70%{box-shadow:0 0 0 16px rgba(232,112,63,0);}
+    100%{box-shadow:0 0 0 0 rgba(232,112,63,0);}
+  }
+</style>
+</head>
+<body>
+
+<header id="site-header">
+  <div class="wrap nav">
+    <div class="logo">
+      <img src="assets/logo.jpg" alt="Relay" style="height:32px; width:auto; display:block;">
+    </div>
+    <a class="nav-cta" href="#cta">Download</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="blob soft" style="width:520px; height:520px; top:-140px; right:-200px; animation:drift 12s ease-in-out infinite;"></div>
+  <div class="blob" style="width:130px; height:130px; bottom:14%; right:6%; opacity:0.9; animation:drift-rev 9s ease-in-out infinite;"></div>
+
+  <div class="wrap hero-grid">
+    <div>
+      <span class="eyebrow">Relay Run &middot; out now on iOS &amp; Android</span>
+      <h1 class="hero-title">A warmer<br>way to <em>run.</em></h1>
+      <p class="hero-sub">Relay lets the people cheering you on send voice notes, texts, and songs timed to your race — so they're with you at mile 3, mile 9, and the finish line, even when they can't be there.</p>
+      <div class="hero-actions">
+        <a class="btn-primary" href="#cta">
+          Download Relay
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#1a0f0a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a class="btn-ghost" href="#course">See how it works</a>
+      </div>
+    </div>
+    <div class="hero-phone-stage">
+      <img src="assets/hero.png" alt="Relay app home screen showing an upcoming race, supporter count, and messages queued along the route" loading="eager">
+    </div>
+  </div>
+
+  <div class="scroll-cue"><span>Scroll</span><span class="line"></span></div>
+</section>
+
+<section class="intro">
+  <div class="wrap">
+    <p>Running is usually something you do alone. Relay changes the pace — your crew can send voice notes, texts, and songs timed to the exact <strong>mile or minute</strong> you need them, so you're never really running by yourself. Turns out, the miles go by faster with company.</p>
+  </div>
+</section>
+
+<section class="course" id="course">
+  <div class="wrap course-track" id="course-track">
+    <div class="course-rail"><div class="course-rail-fill" id="rail-fill"></div></div>
+
+    <div class="stop" data-stop>
+      <div class="marker-col"><div class="marker-dot">00</div></div>
+      <div class="stop-body">
+        <div class="stop-copy">
+          <span class="stop-tag">Start line</span>
+          <h3>Set up your race in a minute.</h3>
+          <p>Name it, set the date and distance, and choose how messages arrive — GPS-triggered by mile, or timer-triggered by minute, so training runs and treadmill miles get cheered on too.</p>
+        </div>
+        <div class="stop-visual">
+          <div class="blob soft"></div>
+          <img src="assets/create-race.png" alt="Edit race screen showing race name, date, distance, goal time, and a choice between by-mile or by-time delivery" loading="lazy">
+        </div>
+      </div>
+    </div>
+
+    <div class="stop" data-stop>
+      <div class="marker-col"><div class="marker-dot">01</div></div>
+      <div class="stop-body">
+        <div class="stop-copy">
+          <span class="stop-tag">Rally your crew</span>
+          <h3>Share your race in seconds.</h3>
+          <p>Send a link or a QR code and anyone can hop in — your coach, your college roommate, your whole group chat. No account required for them to start cheering.</p>
+        </div>
+        <div class="stop-visual">
+          <div class="blob soft"></div>
+          <img src="assets/rally-crew.png" alt="Rally your crew screen with share link and QR code options, and a list of six supporters" loading="lazy">
+        </div>
+      </div>
+    </div>
+
+    <div class="stop" data-stop>
+      <div class="marker-col"><div class="marker-dot">02</div></div>
+      <div class="stop-body">
+        <div class="stop-copy">
+          <span class="stop-tag">Send relays</span>
+          <h3>Cheer from anywhere.</h3>
+          <p>No app to download — the link opens a simple web form right in their browser. Your crew can record a voice note, write a message, or send a song, then pick the exact mile or minute they want it to land.</p>
+        </div>
+        <div class="stop-visual">
+          <div class="blob soft"></div>
+          <img src="assets/send-relays.png" alt="Send relays screen letting a supporter choose voice, text, or song format and pick a delivery mile" loading="lazy">
+        </div>
+      </div>
+    </div>
+
+    <div class="stop" data-stop>
+      <div class="marker-col"><div class="marker-dot">03</div></div>
+      <div class="stop-body">
+        <div class="stop-copy">
+          <span class="stop-tag">During the run</span>
+          <h3>Every mile, tracked live.</h3>
+          <p>Distance, pace, and a projected finish time update as you go — so you always know exactly where you are and how much course is left.</p>
+        </div>
+        <div class="stop-visual">
+          <div class="blob soft"></div>
+          <img src="assets/track-miles.png" alt="Live run tracking screen showing distance, elapsed time, average pace, current pace, and distance to go" loading="lazy">
+        </div>
+      </div>
+    </div>
+
+    <div class="stop" data-stop>
+      <div class="marker-col"><div class="marker-dot">04</div></div>
+      <div class="stop-body">
+        <div class="stop-copy">
+          <span class="stop-tag">Voices from the sidelines</span>
+          <h3>Right when you need them.</h3>
+          <p>Messages surface automatically at their mile or minute — no checking your phone mid-stride. If one hits just right, tap to replay it as many times as you need to get you through.</p>
+        </div>
+        <div class="stop-visual">
+          <div class="blob soft"></div>
+          <img src="assets/voices-sidelines.png" alt="A message from a supporter named Gaby surfacing mid-run with a voice waveform to play" loading="lazy">
+        </div>
+      </div>
+    </div>
+
+    <div class="stop" data-stop>
+      <div class="marker-col"><div class="marker-dot">&#127937;</div></div>
+      <div class="stop-body">
+        <div class="stop-copy">
+          <span class="stop-tag">Finish line</span>
+          <h3>Save the memory, not just the number.</h3>
+          <p>Every race gets saved with the messages that carried you through it — distance, time, and pace alongside the voices that got you to the finish.</p>
+        </div>
+        <div class="stop-visual">
+          <div class="blob soft"></div>
+          <img src="assets/save-memories.png" alt="Saved race screen for a 10K showing stats and a list of replayable messages from a runner's crew" loading="lazy">
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section class="quote-strip">
+  <div class="wrap">
+    <p class="mark">&ldquo;I'd never run for fun, but I'll always <span class="accent">run my mouth</span> about how proud I am of you.&rdquo;</p>
+    <p class="who">— the kind of message that finds you exactly when you need it</p>
+  </div>
+</section>
+
+<section class="cta" id="cta">
+  <div class="blob soft" style="width:420px; height:420px; top:-100px; left:50%; transform:translateX(-50%); opacity:0.22;"></div>
+  <div class="wrap">
+    <span class="cta-badge">Available now</span>
+    <h2>Someone's waiting<br>to <em>cheer</em> you on.</h2>
+    <p class="sub">Relay is live on the App Store and Google Play. Set up your first race, invite your crew, and let them carry you through it — one mile at a time.</p>
+
+    <div class="store-row">
+      <a class="store-btn" href="https://apps.apple.com/app/relay-run/id6797622390" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.04c-.02-2.13 1.74-3.15 1.82-3.2-1-1.46-2.55-1.66-3.1-1.68-1.32-.13-2.58.78-3.25.78-.67 0-1.7-.76-2.8-.74-1.44.02-2.77.84-3.51 2.13-1.5 2.6-.38 6.44 1.08 8.55.71 1.03 1.56 2.19 2.68 2.15 1.08-.04 1.49-.7 2.79-.7 1.3 0 1.67.7 2.81.68 1.16-.02 1.9-1.05 2.6-2.09.82-1.2 1.16-2.36 1.18-2.42-.03-.01-2.26-.87-2.28-3.46zM14.9 5.6c.59-.71.98-1.7.87-2.68-.84.03-1.86.56-2.47 1.26-.55.62-1.03 1.63-.9 2.58.93.07 1.89-.47 2.5-1.16z"/></svg>
+        <span class="txt"><small>Download on the</small><strong>App Store</strong></span>
+      </a>
+      <a class="store-btn" href="https://play.google.com/store/apps/details?id=com.runrelay.relay" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4.5 2.75c-.3.3-.48.75-.48 1.32v15.86c0 .57.18 1.02.48 1.32l.09.08L13.7 12v-.24L4.6 2.67l-.1.08z"/><path d="M16.8 15.1l-3.1-3.1v-.24l3.1-3.1 3.75 2.13c1.07.61 1.07 1.6 0 2.21L16.8 15.1z"/><path d="M13.7 12L4.6 21.3c.35.32.9.35 1.53 0l10.67-6.06L13.7 12z"/><path d="M13.7 12l3.1-3.1L6.13 2.83c-.63-.35-1.18-.3-1.53.02L13.7 12z"/></svg>
+        <span class="txt"><small>Get it on</small><strong>Google Play</strong></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-social">
+      <a href="https://instagram.com/run.relay" target="_blank" rel="noopener" aria-label="Relay on Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.1" fill="currentColor" stroke="none"/></svg>
+        Instagram
+      </a>
+      <a href="https://www.tiktok.com/@run.relay?_r=1&amp;_t=ZT-992vSKUU5vx" target="_blank" rel="noopener" aria-label="Relay on TikTok">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.82c-.9-.94-1.4-2.16-1.4-3.42h-3.02v13.66c0 1.62-1.32 2.94-2.94 2.94a2.94 2.94 0 0 1 0-5.88c.28 0 .55.04.8.11V10.2a6.02 6.02 0 0 0-.8-.05 5.96 5.96 0 1 0 5.96 5.96V8.98a8.5 8.5 0 0 0 5 1.6V7.56a5.5 5.5 0 0 1-3.6-1.74z"/></svg>
+        TikTok
+      </a>
+      <a href="https://x.com/runrelayapp" target="_blank" rel="noopener" aria-label="Relay on X">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 3l7.4 9.6L3.4 21H6l5.9-6.5L16.2 21H21l-7.7-9.9L20.2 3h-2.6l-5.5 6L7.8 3H3z"/></svg>
+        X
+      </a>
+    </div>
+    <div class="foot-divider"></div>
+    <div class="foot-legal">
+      <a href="https://runrelay.org/privacy">Privacy Policy</a>
+      <span class="dot">&middot;</span>
+      <a href="https://runrelay.org/terms">Terms of Use</a>
+      <span class="dot">&middot;</span>
+      <a href="https://runrelay.org/support">Support</a>
+    </div>
+    <p class="foot-tagline">relay &middot; a warmer way to run &middot; iOS &amp; Android</p>
+  </div>
+</footer>
+
+<script>
+  // Scroll-reveal for each stop + active marker state
+  const stops = document.querySelectorAll('[data-stop]');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('active');
+      }
+    });
+  }, { threshold: 0.32 });
+  stops.forEach(s => io.observe(s));
+
+  // Route rail fill tied to scroll progress through the course track
+  const track = document.getElementById('course-track');
+  const railFill = document.getElementById('rail-fill');
+  function updateRail(){
+    const rect = track.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const total = rect.height;
+    let progressed = (vh * 0.75) - rect.top;
+    progressed = Math.max(0, Math.min(progressed, total));
+    const pct = total > 0 ? (progressed / total) * 100 : 0;
+    railFill.style.height = pct + '%';
+  }
+  window.addEventListener('scroll', updateRail, { passive: true });
+  window.addEventListener('resize', updateRail);
+  updateRail();
+
+  // Header background solidifies on scroll
+  const header = document.getElementById('site-header');
+  function updateHeader(){
+    if (window.scrollY > 40) {
+      header.style.background = 'rgba(26,15,10,0.92)';
+      header.style.backdropFilter = 'blur(10px)';
+    } else {
+      header.style.background = 'linear-gradient(to bottom, rgba(26,15,10,0.92), rgba(26,15,10,0))';
+      header.style.backdropFilter = 'none';
+    }
+  }
+  window.addEventListener('scroll', updateHeader, { passive: true });
+  updateHeader();
+
+  // Custom pulsing-dot cursor (desktop, fine pointer, motion-safe only)
+  (function initCursor(){
+    const finePointer = window.matchMedia('(pointer: fine)').matches;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!finePointer || reduceMotion) return;
+
+    const dot = document.createElement('div');
+    dot.className = 'cursor-dot';
+    document.body.appendChild(dot);
+    document.body.classList.add('custom-cursor-active');
+
+    let mouseX = 0, mouseY = 0, curX = 0, curY = 0, started = false;
+
+    window.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      if (!started) {
+        curX = mouseX; curY = mouseY; started = true;
+        dot.classList.add('active');
+      }
+    });
+
+    function raf(){
+      curX += (mouseX - curX) * 0.22;
+      curY += (mouseY - curY) * 0.22;
+      dot.style.transform = `translate(${curX}px, ${curY}px) translate(-50%, -50%)`;
+      requestAnimationFrame(raf);
+    }
+    raf();
+
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => dot.classList.add('hovering'));
+      el.addEventListener('mouseleave', () => dot.classList.remove('hovering'));
+    });
+  })();
+</script>
+
+</body>
 </html>
